@@ -1,0 +1,58 @@
+/*The sequence diagram of reprogramming of ECU through UDS is done with tool plant uml*/
+/*Run the below code in the given link below:
+https://www.plantuml.com/plantuml/uml/SoWkIImgAStDuNBCoKnELT2rKt3AJx9IS2mjoKZDAybCJYp9pCzJ24ejB4qjBk42oYde0jM05MDHLLoGdrUSoeLkM5u-K5sHGY9sGo6ARNHr2QY66kwGcfS2SZ00
+*/
+
+@startuml
+actor tester #green
+participant server
+tester----->server : diagnostic request
+server---->tester : positive response
+activate server
+tester---->server :$22 request
+server--->"read data by identifier"
+"read data by identifier"----->tester : positive response
+tester--->server : $10 request
+server--->"diagnostic session control"
+activate "diagnostic session control"
+"diagnostic session control" --->"diagnostic session control" : "03 sub function extended session"
+"diagnostic session control"---->tester : positive response
+tester--->server : $31 request
+server---->"routine control" 
+activate "routine control"
+"routine control"--->tester : positive response
+deactivate "diagnostic session control"#black
+tester--->server :$27 request
+server--->"security access"
+"security access"---->tester : positive response
+tester--->server :$2E request
+server--->"write data by identifier"
+"write data by identifier"---->tester : positive response
+activate "routine control" #gold
+tester----> server : "$31 request"
+server---->"routine control" 
+"routine control"--->"routine control" : "sub function erase memory"
+"routine control"---->tester : "positive response"
+tester--->server :$34 request
+server--->"request download" : $34 request
+"request download"---->tester : positive request 
+tester--->server :$36 request
+server---->"transfer data" 
+"transfer data"---->tester : "positive response"
+tester--->server :$36 request
+server--->"request transfer exit"
+"request transfer exit"---->tester : "positive response"
+tester--->server :$31request
+activate "routine control"#darkblue
+server--->"routine control"
+"routine control"---->"routine control": "sub function check memory"
+"routine control"---->tester : "positive response"
+deactivate "routine control" #darkblue
+deactivate "routine control"
+tester--->server :$11 request
+server---->"ECU reset"
+activate "ECU reset"
+"ECU reset"--->"ECU reset" : "soft reset"
+"ECU reset"--->tester : "positive response"
+deactivate "ECU reset"
+@enduml
